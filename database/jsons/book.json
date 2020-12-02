@@ -1,0 +1,41 @@
+[
+	{
+		"title" : "Alicia en el País de las Maravillas / Alicia a través del espejo",
+        "description" : "El presente volumen reúne las dos obras más célebres que escribió Lewis Carroll y que gracias a la imaginación y el ingenio que desbordan le han valido un lugar en el mundo moderno. Escrito para la niña Alicia Liddell, de diez años de edad, Alicia en el País de las Maravillas (1865) es un delicioso entramado de situaciones verosímiles y a la vez absurdas, metamorfosis insólitas de seres y ambientes, juegos con el lenguaje y con la lógica y asociaciones oníricas que hacen de él un libro inolvidable. Seis años más tarde halló una secuela equiparable, cuando no superior, en A través del espejo y lo que Alicia encontró al otro lado, que cuenta entre sus personajes con algunos de los más citados y conocidos de este peculiar universo, como Tararí y Tarará (Tweedledee y Tweedledum) o el oviforme Zanco Panco (Humpty Dumpty).",
+        "year" : 2013,
+        "pages" : 503,
+       	"isbn" : "6070749004",
+        "editorial" : "Kindle",
+        "edition" : 1,
+        "autor" : "Lewis Carroll",
+        "cover" : "libro1.png",
+        "category_id" : 1,
+        "status" : 0
+	},
+	{
+		"title" : "Libro 2",
+        "description" : "Descripcion del libro2",
+        "year" : 2013,
+        "pages" : 503,
+       	"isbn" : "6070749006",
+        "editorial" : "Kindle",
+        "edition" : 1,
+        "autor" : "Lewis Carroll",
+        "cover" : "libro2.png",
+        "category_id" : 2,
+        "status" : 1
+	},
+	{
+		"title" : "Libro 3",
+        "description" : "Descripcion del libro3",
+        "year" : 2013,
+        "pages" : 503,
+       	"isbn" : "6070749005",
+        "editorial" : "Kindle",
+        "edition" : 1,
+        "autor" : "Lewis Carroll",
+        "cover" : "libro3.png",
+        "category_id" : 3,
+        "status" : 0
+	}
+]
