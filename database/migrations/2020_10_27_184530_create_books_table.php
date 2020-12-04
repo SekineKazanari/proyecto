@@ -33,7 +33,7 @@ class CreateBooksTable extends Migration
 
             $table->foreign('category_id')->references('id')->on('categories');
 
-            $table->integer('status')->default(0);
+             $table->integer('status')->default(0);
 
             $table->timestamps();
         });

@@ -10,15 +10,22 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
-                    <h1>Usted claramente es admin xd</h1>
+                    <h1>Información sobre los prestamos</h1>
                     <p></p>
-                    <h4>Ya sabe qué hacer :v</h4>
+                    <h4>Promedio de generos de libros prestados</h4>
+                    <h5>Aquí se muestra el genero que los usuarios prefieren</h5>
 
-                   
+                    <canvas id="myChart"></canvas>
+                    
                 </div>
             </div>
         </div>
+
     </x-app-layout> 
+        <x-slot name="script">
+
+        </script>
+    </x-slot>
 @endif
 
 

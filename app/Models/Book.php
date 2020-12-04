@@ -26,8 +26,6 @@ class Book extends Model
         'cover',
 
         'category_id',
-
-        'status',
     ];
 }
  

@@ -16,12 +16,15 @@ class CreateLoansTable extends Migration
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
 
-            // $table->foreign('user_id')->references('id')->on('users');
-            // $table->foreign('book_id')->references('id')->on('books');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
 
-            // $table->string('date_loan');
-            // $table->string('date_return');
-            // $table->integer('status')->default(1);
+            $table->unsignedBigInteger('book_id')->nullable();
+            $table->foreign('book_id')->references('id')->on('books');
+
+            $table->DATETIME('date_loan');
+            $table->DATETIME('date_return');
+            $table->integer('status')->default(1);
 
             $table->timestamps();
         });

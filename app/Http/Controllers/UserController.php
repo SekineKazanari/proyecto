@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Book;
-use App\Models\Loan;
 use Illuminate\Http\Request;
 
 use Auth;
@@ -20,11 +18,8 @@ class UserController extends Controller
     {
        if (Auth::user()->hasPermissionTo('crud categories')) {
 
-             $users = User::all();
-            $loans = Loan::all();
-            $books = Book::all();
-
-            return view('users.index',compact('users', 'loans', 'books'));
+            $users = User::all();
+            return view('users.index',compact('users'));
         }else{
             return redirect()->back()->with('error', 'No tienes permisos');
         }

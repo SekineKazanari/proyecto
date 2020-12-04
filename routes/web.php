@@ -33,8 +33,6 @@ use Illuminate\Support\Facades\Route;
 
 	Route::delete('/books/{book}', 'BookController@destroy');
 
-	Route::get('/books/details/{book}', 'BookController@show');
-
 	//CATEGORIES
 	Route::get('/categories','CategoryController@index');
 
@@ -53,8 +51,6 @@ use Illuminate\Support\Facades\Route;
 
 	Route::delete('/loans/{loan}','LoanController@destroy');
 
-	Route::get('/loans/{loan}','LoanController@show');
-
 	//USERS
 	Route::get('/users','UserController@index');
 
@@ -63,6 +59,4 @@ use Illuminate\Support\Facades\Route;
 	Route::put('/users','UserController@update');
 
 	Route::delete('/users/{user}','UserController@destroy');
-
-	Route::delete('/users/details/{user}','UserController@show');
 });

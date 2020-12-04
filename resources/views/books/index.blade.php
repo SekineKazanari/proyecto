@@ -62,20 +62,37 @@
 					      </td>
 
 					      <td>
-					      	<button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#detailsBook">
+
+					      	@if (Auth::user()->hasPermissionTo('add loans') && isset($loans))
+					      		@if ($book->status == 0)
+					      			<form action="{{url('loan')}}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-warning" style="margin-bottom: 5px">
+						    				Loan
+						    			</button>
+                                        <input type="hidden" name="id" value="{{$book->id}}">
+                                    </form>
+					    		@endif
+						    @endif
+
+					    	@if (Auth::user()->hasPermissionTo('crud categories'))
+					    		<button type="button" class="btn btn-info" style="margin-bottom: 5px" data-toggle="modal" data-target="#loanBookModalAdmin">
+					    			Loans
+					    		</button>
+					    	@endif
+
+					      	<button type="button" onclick="viewBook({{ $book }}, {{ $book->category }})" style="margin-bottom: 5px" class="btn btn-primary" data-toggle="modal" data-target="#viewBookModal">
 				    			Details
 				    		</button>
 
-				    		<button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#loanBook">
-				    			Loan
-				    		</button>
+				    		
 
 				    		@if (Auth::user()->hasPermissionTo('crud categories'))
-						      	<button onclick="editBook({{ $book->id }}, '{{ $book->title }}', '{{ $book->description }}', '{{ $book->year }}', '{{ $book->pages }}', '{{ $book->isbn }}', '{{ $book->editorial }}', '{{ $book->edition }}', '{{ $book->autor }}', '{{ $book->cover }}', '{{ $book->category_id }}')" class="btn btn-warning" data-toggle="modal" data-target="#editBookModal">
+						      	<button onclick="editBook({{ $book->id }}, '{{ $book->title }}', '{{ $book->description }}', '{{ $book->year }}', '{{ $book->pages }}', '{{ $book->isbn }}', '{{ $book->editorial }}', '{{ $book->edition }}', '{{ $book->autor }}', '{{ $book->category_id }}')" style="margin-bottom: 5px" class="btn btn-warning" data-toggle="modal" data-target="#editBookModal">
 						      		Edit Book
 						      	</button>
 
-						      	<button onclick="removeBook({{ $book->id }},this)" class="btn btn-danger">
+						      	<button onclick="removeBook({{ $book->id }},this)" style="margin-bottom: 5px" class="btn btn-danger">
 						      		Remove Book
 						      	</button>
 						      @endif
@@ -293,7 +310,7 @@
 
 				<form method="POST" action="{{ url('books') }}">
 					@csrf
-					@method('PUT')
+					@method('PUT');
 
 					<div class="modal-body">
 
@@ -410,20 +427,6 @@
 							</div>
 						</div>
 
-						{{--COVER--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Cover
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="file" class="form-control" name="cover" id="cover">
-							</div>
-						</div>
-
 						{{--CATEGORY--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
@@ -449,9 +452,6 @@
 							  </select>
 							</div>
 						</div>
-
-
-
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -468,10 +468,236 @@
 		</div>
 	</div>
 
+	<!--MODAL LOAN BOOK-->
+	{{-- Es mejor realizar la accion del loan sólo con el botón --}}
+
+	{{-- <div class="modal" id="loanBookModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Prestamo de libro</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form method="POST" action="{{ url('loans') }}">
+					@csrf
+					@method('PUT')
+					<div class="modal-body">
+						<p>¿Seguro que desea pedir prestado este libro?</p>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" {{-- onclick="loanBook({{$book->book_id}}, {{$book->user_id}},{{$book->date_loan}},{{$bo}},this)"  --}}{{-- class="btn btn-primary">
+							Sí
+						</button>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+						<input type="hidden" name="id" id="id">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div> --}}
+
+	<!--P E N D I E N T E-->
+	<!--MODAL DETAILS BOOK-->
+	{{-- Especificaciones del libro --}}
+	<div class="modal" id="viewBookModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<h5 class="modal-title" id="title">
+						{{-- {{ $book->title }} --}}
+					</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<div align="center" style="margin-bottom: 20px">
+	                    <img id="cover" src="">
+	                    <img src="{{ asset('img/book/'.$book->cover.'') }}">
+	                </div>
+
+	                <table class="table">
+	                	<tbody>
+	                		<tr>
+	                			<th>Autor:</th>
+	                			<td id="autor">
+	                			</td>
+	                		</tr>
+	                		<tr>
+	                			<th>Year:</th>
+	                			<td id="year">
+	                			</td>
+	                		</tr>
+	                		<tr>
+	                			<th>Pages:</th>
+	                			<td id="pages">
+	                			</td>
+	                		</tr>
+	                		<tr>
+	                			<th>ISBN:</th>
+	                			<td id="isbn">
+	                			</td>
+	                		</tr>
+	                		<tr>
+	                			<th>Editorial:</th>
+	                			<td id="editorial">
+	                			</td>
+	                		</tr>
+	                		<tr>
+	                			<th>Edition:</th>
+	                			<td id="edition">
+	                			</td>
+	                		</tr>
+	                		<tr>
+	                			<th>Category:</th>
+	                			<td id="category_id">
+	                			</td>
+	                		</tr>
+	                	</tbody>
+	                </table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{-- Agregar datos --}}
+	<!--INFORMACIÓN DE PRESTAMOS DEL LIBRO ADMIN-->
+	{{-- Aqui se muestran los datos sobre la persona que tiene el libro --}}
+	<div class="modal fade bd-example-modal-lg" id="loanBookModalAdmin" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<h5 class="modal-title" id="title">
+					</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<table class="table">
+				  <thead class="thead-dark">
+				    <tr>
+				      <th scope="col">#</th>
+				      <th scope="col">User</th>
+				      <th scope="col">Book status</th>
+				      <th scope="col">Date loan</th>
+				      <th scope="col">Date return</th>
+				      <th scope="col">Actions</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+				  	
+					    <tr>
+					      <th scope="row">
+					      	{{-- {{ $loan->id }} --}}
+					      </th>
+					      <td>
+					      	{{-- {{ $user->id }} --}}
+					      </td>
+					      <td>
+					      	{{ $book->title }}
+					      </td>
+					      <td>
+					      	{{-- {{ $loan->date_loan }} --}}
+					      </td>
+					      <td>
+					      	{{-- {{ $loan->date_return }} --}}
+					      </td>
+					      <td>
+				    		<button type="button" class="btn btn-info" style="margin-bottom: 5px" data-toggle="modal" data-target="#detailsUser">
+				    			Details user
+				    		</button>
+					      </td>
+					    </tr>
+				  </tbody>
+				</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Agregar datos-->
+	<!--INFORMACIÓN DEL USUARIO EN ADMIN-->
+	{{-- Aqui se pueden ver los libros que ha pedido prestado el usuario --}}
+	<div class="modal fade bd-example-modal-lg" id="detailsUser" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<h5 class="modal-title" id="title">
+					</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<table class="table">
+				  <thead class="thead-dark">
+				    <tr>
+				      <th scope="col">#</th>
+				      <th scope="col">Name</th>
+				      <th scope="col">E-Mail</th>
+				      <th scope="col">Date loan</th>
+				      <th scope="col">Date return</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+				  	
+					    <tr>
+					      <th scope="row">
+					      	{{-- {{ $loan->id }} --}}
+					      </th>
+					      <td>
+					      	{{-- {{ $user->id }} --}}
+					      </td>
+					      <td>
+					      	{{ $book->title }}
+					      </td>
+					      <td>
+					      	{{-- {{ $loan->date_loan }} --}}
+					      </td>
+					      <td>
+					      	{{-- {{ $loan->date_return }} --}}
+					      </td>
+					    </tr>
+				  </tbody>
+				</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<x-slot name="script">
 		<script type="text/javascript">
+			function viewBook(book,category){
+
+				$("#title").text(book.title)
+				$("#autor").text(book.autor)
+				$("#year").text(book.year)
+				$("#pages").text(book.pages)
+				$("#isbn").text(book.isbn)
+				$("#editorial").text(book.editorial)
+				$("#edition").text(book.edition)
+				$("#category_id").text(category.name)
+			}
 			
-			function editBook(id,title,description,year,pages,isbn,editorial,edition,autor,cover,category_id){
+			function editBook(id,title,description,year,pages,isbn,editorial,edition,autor,category_id){
 
 				$("#title").val(title)
 				$("#description").val(description)
@@ -481,7 +707,6 @@
 				$("#editorial").val(editorial)
 				$("#edition").val(edition)
 				$("#autor").val(autor)
-				$("#cover").val(cover)
 				$("#category_id").val(category_id)
 				$("#id").val(id)
 
@@ -497,7 +722,6 @@
 				})
 				.then((willDelete) => {
 				  if (willDelete) {
-
 				  	axios.delete('{{ url('books') }}/'+id, {
 					    id: id,
 					    _token: '{{ csrf_token() }}'
@@ -508,9 +732,7 @@
 					    	swal(response.data.message, {
 								    icon: "success",
 							    });
-
 					    	$(target).parent().parent().remove();
-
 					    }else{
 					    	swal(response.data.message, {
 								    icon: "error",
@@ -524,6 +746,10 @@
 				  }
 				});
 			}
+
+			function loanBook(book_id, user_id, date_loan, cont, target) {
+				$("#status") == 1;
+    		}
 
 		</script>
     </x-slot>

@@ -19,6 +19,6 @@ class loan extends Model
         'book_id',
         'date_loan',
         'date_return',
-        'satus',
+        'status',
     ];
 }

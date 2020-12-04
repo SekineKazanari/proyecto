@@ -53,7 +53,6 @@ class PermissionsTableSeeder extends Seeder
             'update users',
             'delete users',
             'view loans',
-            'add loans',
             'update loans',
             'delete loans'
         ]);

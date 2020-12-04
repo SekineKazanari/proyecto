@@ -20,33 +20,53 @@
 				  <thead class="thead-dark">
 				    <tr>
 				      <th scope="col">#</th>
-				      <th scope="col">Title</th>
-				      <th scope="col">Description</th>
-				      <th scope="col">Category</th>
+				      <th scope="col">User</th>
+				      <th scope="col">Book</th>
+				      <th scope="col">Date loan</th>
+				      <th scope="col">Date return</th>
 				      <th scope="col">Status</th>
-				      <th scope="col">Details</th>
 				      <th scope="col">Actions</th>
 				    </tr>
 				  </thead>
 				  <tbody>
-				  	@if (isset($books) && count($books)>0)
-				  	@foreach ($books as $book)
+				  	@if (isset($loans) && count($loans)>0 && isset($users))
+				  	@foreach ($loans as $loan)
 				  	
 				    <tr>
 				      <th scope="row">
-				      	{{ $book->id }}
+				      	{{ $loan->id }}
 				      </th>
 				      <td>
-				      	{{ $book->title }}
+				      	{{-- {{ $loan->user->name }} --}}
 				      </td>
 				      <td>
-				      	{{ $book->description }}
+				      	{{-- {{ $loan->book->title }} --}}
 				      </td>
 				      <td>
-				      	{{ $book->category_id }}
+				      	{{ $loan->date_loan }}
 				      </td>
 				      <td>
-				      	{{ $book->status }}
+				      	{{ $loan->date_return }}
+				      </td>
+				      <td>
+				      	{{ $loan->status }}
+				      </td>
+				      <td>
+				      	@if (Auth::user()->hasPermissionTo('add loans') && isset($loans->status) == 1)
+				      		<button type="submit" class="btn btn-warning" style="margin-bottom: 5px">
+			    				Give back
+			    			</button>
+				      	@endif
+
+				      	@if (Auth::user()->hasPermissionTo('crud categories'))
+					      	<button onclick="editLoan({{ $loan->id }}, '{{ $loan->date_loan }}', '{{ $loan->date_return }}')" style="margin-bottom: 5px" class="btn btn-warning" data-toggle="modal" data-target="#editLoanModal">
+					      		Edit Loan
+					      	</button>
+
+					      	<button onclick="removeLoan({{ $loan->id }},this)" style="margin-bottom: 5px" class="btn btn-danger">
+					      		Remove Loan
+					      	</button>
+					      @endif
 				      </td>
 				    </tr>
 
@@ -60,13 +80,13 @@
     </div>
 
 
-    <!-- MODAL -->
+    <!-- MODAL EDIT LOAN -->
 
-	<div class="modal fade" id="addBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="editLoanModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Add new book</h5>
+					<h5 class="modal-title" id="exampleModalLabel">Edit loan</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -74,177 +94,106 @@
 
 				<form method="POST" action="{{ url('books') }}" enctype="multipart/form-data">
 					@csrf
+					@method('PUT');
 
 					<div class="modal-body">
 
-						{{--TITLE--}}
+						{{--loan--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
-						    	Title
+						    	Date loan
 						    </label>
 
 						    <div class="input-group mb-3">
 							  <div class="input-group-prepend">
 							    <span class="input-group-text" id="basic-addon1">@</span>
 							  </div>
-							  <input type="text" class="form-control" placeholder="Book title" aria-label="book" aria-describedby="basic-addon1" name="title">
+							  <input type="text" class="form-control" aria-describedby="basic-addon1" id="date_loan">
 							</div>
 						</div>
 
-						{{--DESCRIPTION--}}
+						{{--return--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
-						    	Description
+						    	Date return
 						    </label>
 
 						    <div class="input-group mb-3">
 							  <div class="input-group-prepend">
 							    <span class="input-group-text" id="basic-addon1">@</span>
 							  </div>
-							  <textarea class="form-control" cols="5" placeholder="Wriye here a description" name="description">
-							  </textarea>
+							  <input type="text" class="form-control" aria-describedby="basic-addon1" id="date_return">
 							</div>
 						</div>
-
-						{{--YEAR--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Year
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="number" class="form-control" placeholder="1999" name="year">
-							</div>
-						</div>
-
-						{{--PAGES--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Pages
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="number" class="form-control" placeholder="600" name="pages">
-							</div>
-						</div>
-
-						{{--ISBN--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	ISBN
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="text" class="form-control" placeholder="libro2.png" name="isbn">
-							</div>
-						</div>
-
-						{{--EDITORIAL--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Editorial
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="text" class="form-control" placeholder="IVREA" name="editorial">
-							</div>
-						</div>
-
-						{{--EDITION--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Edition
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="number" class="form-control" placeholder="2" name="edition">
-							</div>
-						</div>
-
-						{{--AUTOR--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Autor
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="text" class="form-control" placeholder="Kagune Maruyama" name="autor">
-							</div>
-						</div>
-
-						{{--COVER--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Cover
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="file" class="form-control" name="cover">
-							</div>
-						</div>
-
-						{{--CATEGORY--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Category
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <select class="form-control" name="category_id">
-							  	
-							  	@if (isset($categories) && count($categories)>0)
-							  	@foreach ($categories as $category)
-
-							  		<option value="{{ $category->id }}">
-							  			{{ $category->name }}
-							  		</option>
-
-							  	@endforeach
-							  	@endif
-
-							  </select>
-							</div>
-						</div>
-
-
-
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">
 							Cancel
 						</button>
 						<button type="submit" class="btn btn-primary">
-							Save book
+							Save loan
 						</button>
+						<input type="hidden" name="id" id="id">
 					</div>
 				</form>
 				
 			</div>
 		</div>
 	</div>
+
+	<x-slot name="script">
+		<script type="text/javascript">
+			function viewLoans(){
+
+				$("#title").val(title)
+			}
+			
+			function editLoan(id,date_loan,date_return){
+				$("#id")val(id)
+				$("#date_loan")val(date_loan)
+				$("#date_return")val(date_return)
+
+			}
+
+			function removeLoan(id,target){
+				swal({
+				  title: "Are you sure?",
+				  text: "Once deleted, you will not be able to recover this user!",
+				  icon: "warning",
+				  buttons: true,
+				  dangerMode: true,
+				})
+				.then((willDelete) => {
+				  if (willDelete) {
+
+				  	axios.delete('{{ url('loans') }}/'+id, {
+					    id: id,
+					    _token: '{{ csrf_token() }}'
+					  })
+					  .then(function (response) {
+					    console.log(response);
+					    if (response.data.code==200) {
+					    	swal(response.data.message, {
+								    icon: "success",
+							    });
+
+					    	$(target).parent().parent().remove();
+
+					    }else{
+					    	swal(response.data.message, {
+								    icon: "error",
+							    });
+					    }
+					  })
+					  .catch(function (error) {
+					    console.log(error);
+					    swal('Error ocurred',{ icon:'error' })
+					  });
+				  }
+				});
+			}
+
+		</script>
+    </x-slot>
 
 </x-app-layout>

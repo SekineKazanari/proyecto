@@ -6,6 +6,14 @@
 		            {{ __('Users') }}
 		        </h2>
     		</div>
+
+    		@if (Auth::user()->hasPermissionTo('crud categories'))
+		    	<div class="col-md-4 col-12">
+		    		<button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addUserModal">
+		    			Add user
+		    		</button>
+		    	</div>
+	    	@endif
     	</div>
     </x-slot>
 
@@ -20,33 +28,40 @@
 				  <thead class="thead-dark">
 				    <tr>
 				      <th scope="col">#</th>
-				      <th scope="col">Title</th>
-				      <th scope="col">Description</th>
-				      <th scope="col">Category</th>
-				      <th scope="col">Status</th>
-				      <th scope="col">Details</th>
+				      <th scope="col">Name</th>
+				      <th scope="col">E-Mail</th>
 				      <th scope="col">Actions</th>
 				    </tr>
 				  </thead>
 				  <tbody>
-				  	@if (isset($books) && count($books)>0)
-				  	@foreach ($books as $book)
-				  	
+				  	@if (isset($usres) && count($users)>0)
+				  	@foreach ($users as $user)
+
 				    <tr>
 				      <th scope="row">
-				      	{{ $book->id }}
+				      	{{ $user->id }}
 				      </th>
 				      <td>
-				      	{{ $book->title }}
+				      	{{ $user->name }}
 				      </td>
 				      <td>
-				      	{{ $book->description }}
+				      	{{ $user->email }}
 				      </td>
 				      <td>
-				      	{{ $book->category_id }}
-				      </td>
-				      <td>
-				      	{{ $book->status }}
+				      	<button type="button" onclick="viewUser({{ $book }}, {{ $category }})" style="margin-bottom: 5px" class="btn btn-primary" data-toggle="modal" data-target="#viewUserModal">
+				    		Details
+			    		</button>
+
+			    		@if (Auth::user()->hasPermissionTo('crud categories'))
+					      	<button onclick="editUser({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->password }}')" style="margin-bottom: 5px" class="btn btn-warning" data-toggle="modal" data-target="#editUser
+					      		Modal">
+					      		Edit User
+					      	</button>
+
+					      	<button onclick="removeUser({{ $user->id }},this)" style="margin-bottom: 5px" class="btn btn-danger">
+					      		Remove User
+					      	</button>
+					      @endif
 				      </td>
 				    </tr>
 
@@ -60,191 +75,250 @@
     </div>
 
 
-    <!-- MODAL -->
-
-	<div class="modal fade" id="addBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- MODAL ADD USER-->
+	<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Add new book</h5>
+					<h5 class="modal-title" id="exampleModalLabel">Add new admin</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 
-				<form method="POST" action="{{ url('books') }}" enctype="multipart/form-data">
+				<form method="POST" action="{{ url('users') }}" onsubmit="return validarRegistro()" enctype="multipart/form-data">
 					@csrf
 
 					<div class="modal-body">
 
-						{{--TITLE--}}
+						{{--NAME--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
-						    	Title
+						    	Name
 						    </label>
 
 						    <div class="input-group mb-3">
 							  <div class="input-group-prepend">
 							    <span class="input-group-text" id="basic-addon1">@</span>
 							  </div>
-							  <input type="text" class="form-control" placeholder="Book title" aria-label="book" aria-describedby="basic-addon1" name="title">
+							  <input type="text" class="form-control" placeholder="Name of user" aria-describedby="basic-addon1" name="name">
 							</div>
 						</div>
 
-						{{--DESCRIPTION--}}
+						{{--EMAIL--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
-						    	Description
+						    	E-Mail
 						    </label>
 
 						    <div class="input-group mb-3">
 							  <div class="input-group-prepend">
 							    <span class="input-group-text" id="basic-addon1">@</span>
 							  </div>
-							  <textarea class="form-control" cols="5" placeholder="Wriye here a description" name="description">
-							  </textarea>
+							  <input type="text" class="form-control" placeholder="E-mail of user" aria-describedby="basic-addon1" name="email">
 							</div>
 						</div>
 
-						{{--YEAR--}}
+						{{--PASSWORD--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
-						    	Year
+						    	Password
 						    </label>
 
 						    <div class="input-group mb-3">
 							  <div class="input-group-prepend">
 							    <span class="input-group-text" id="basic-addon1">@</span>
 							  </div>
-							  <input type="number" class="form-control" placeholder="1999" name="year">
+							  <input type="Password" class="form-control" placeholder="*****" aria-describedby="basic-addon1" name="password">
 							</div>
 						</div>
 
-						{{--PAGES--}}
+						{{--CONFIRM PASSWORD--}}
 						<div class="form-group">
 						    <label for="exampleInputEmail1">
-						    	Pages
+						    	Confirm password
 						    </label>
 
 						    <div class="input-group mb-3">
 							  <div class="input-group-prepend">
 							    <span class="input-group-text" id="basic-addon1">@</span>
 							  </div>
-							  <input type="number" class="form-control" placeholder="600" name="pages">
+							  <input type="Password" class="form-control" placeholder="*****" aria-describedby="basic-addon1" name="password2">
 							</div>
 						</div>
-
-						{{--ISBN--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	ISBN
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="text" class="form-control" placeholder="libro2.png" name="isbn">
-							</div>
-						</div>
-
-						{{--EDITORIAL--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Editorial
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="text" class="form-control" placeholder="IVREA" name="editorial">
-							</div>
-						</div>
-
-						{{--EDITION--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Edition
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="number" class="form-control" placeholder="2" name="edition">
-							</div>
-						</div>
-
-						{{--AUTOR--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Autor
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="text" class="form-control" placeholder="Kagune Maruyama" name="autor">
-							</div>
-						</div>
-
-						{{--COVER--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Cover
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <input type="file" class="form-control" name="cover">
-							</div>
-						</div>
-
-						{{--CATEGORY--}}
-						<div class="form-group">
-						    <label for="exampleInputEmail1">
-						    	Category
-						    </label>
-
-						    <div class="input-group mb-3">
-							  <div class="input-group-prepend">
-							    <span class="input-group-text" id="basic-addon1">@</span>
-							  </div>
-							  <select class="form-control" name="category_id">
-							  	
-							  	@if (isset($categories) && count($categories)>0)
-							  	@foreach ($categories as $category)
-
-							  		<option value="{{ $category->id }}">
-							  			{{ $category->name }}
-							  		</option>
-
-							  	@endforeach
-							  	@endif
-
-							  </select>
-							</div>
-						</div>
-
-
-
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">
 							Cancel
 						</button>
-						<button type="submit" class="btn btn-primary">
-							Save book
+						<button type="submit" onsubmit="return validatePass()" class="btn btn-primary">
+							Save user
 						</button>
 					</div>
 				</form>
-				
 			</div>
 		</div>
 	</div>
+
+	<!-- MODAL EDIT USER-->
+	<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Add new admin</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+
+				<form method="POST" action="{{ url('users') }}" enctype="multipart/form-data">
+					@csrf
+					@method('PUT');
+
+					<div class="modal-body">
+
+						{{--NAME--}}
+						<div class="form-group">
+						    <label for="exampleInputEmail1">
+						    	Name
+						    </label>
+
+						    <div class="input-group mb-3">
+							  <div class="input-group-prepend">
+							    <span class="input-group-text" id="basic-addon1">@</span>
+							  </div>
+							  <input type="text" class="form-control" placeholder="Name of user" aria-describedby="basic-addon1" name="name" id="name">
+							</div>
+						</div>
+
+						{{--EMAIL--}}
+						<div class="form-group">
+						    <label for="exampleInputEmail1">
+						    	E-Mail
+						    </label>
+
+						    <div class="input-group mb-3">
+							  <div class="input-group-prepend">
+							    <span class="input-group-text" id="basic-addon1">@</span>
+							  </div>
+							  <input type="text" class="form-control" placeholder="E-mail of user" aria-describedby="basic-addon1" name="email" id="email">
+							</div>
+						</div>
+
+						{{--PASSWORD--}}
+						<div class="form-group">
+						    <label for="exampleInputEmail1">
+						    	Password
+						    </label>
+
+						    <div class="input-group mb-3">
+							  <div class="input-group-prepend">
+							    <span class="input-group-text" id="basic-addon1">@</span>
+							  </div>
+							  <input type="Password" class="form-control" placeholder="*****" aria-describedby="basic-addon1" name="password" id="password">
+							</div>
+						</div>
+
+						{{--CONFIRM PASSWORD--}}
+						<div class="form-group">
+						    <label for="exampleInputEmail1">
+						    	Confirm password
+						    </label>
+
+						    <div class="input-group mb-3">
+							  <div class="input-group-prepend">
+							    <span class="input-group-text" id="basic-addon1">@</span>
+							  </div>
+							  <input type="Password" class="form-control" placeholder="*****" aria-describedby="basic-addon1" name="password2">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">
+							Cancel
+						</button>
+						<button type="submit" onsubmit="return validatePass()" class="btn btn-primary">
+							Save user
+						</button>
+						<input type="hidden" name="id" id="id">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<x-slot name="script">
+		<script type="text/javascript">
+			function validarRegistro(){
+				if ($("#password").val() == $("#password2").val()) {
+					return true;
+				}else{
+					$("#password").addClass('is-invalid')
+					$("#password2").addClass('is-invalid')
+
+					swal("", "Las contraseñas no coinciden", "error");
+
+					return false;
+				}
+			}
+
+			function viewUser(){
+
+				$("#title").val(title)
+			}
+			
+			function editUser(id,name,email,password){
+				$("#id")val(id)
+				$("#name")val(name)
+				$("#email")val(email)
+				$("#password")val(password)
+
+			}
+
+			function removeUser(id,target){
+				swal({
+				  title: "Are you sure?",
+				  text: "Once deleted, you will not be able to recover this user!",
+				  icon: "warning",
+				  buttons: true,
+				  dangerMode: true,
+				})
+				.then((willDelete) => {
+				  if (willDelete) {
+
+				  	axios.delete('{{ url('users') }}/'+id, {
+					    id: id,
+					    _token: '{{ csrf_token() }}'
+					  })
+					  .then(function (response) {
+					    console.log(response);
+					    if (response.data.code==200) {
+					    	swal(response.data.message, {
+								    icon: "success",
+							    });
+
+					    	$(target).parent().parent().remove();
+
+					    }else{
+					    	swal(response.data.message, {
+								    icon: "error",
+							    });
+					    }
+					  })
+					  .catch(function (error) {
+					    console.log(error);
+					    swal('Error ocurred',{ icon:'error' })
+					  });
+				  }
+				});
+			}
+
+			function loanBook(){
+				$("#status") == 1;
+
+			}
+
+		</script>
+    </x-slot>
 
 </x-app-layout>

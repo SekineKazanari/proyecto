@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\Loan;
 use Illuminate\Http\Request;
 
 use Auth;
@@ -19,8 +20,9 @@ class BookController extends Controller
     {
         $books = Book::all();
         $categories = Category::all();
+        $loans = Loan::all();
 
-        return view('books.index',compact('books','categories'));
+        return view('books.index',compact('books', 'categories', 'loans'));
     }
 
     /**
@@ -72,9 +74,8 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show(Book $book)
+    public function show()
     {
-        //
     }
 
     /**
@@ -95,7 +96,7 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Book $book)
+    public function update(Request $request)
     {
         $book = Book::find($request->id); 
         //Arreglar
