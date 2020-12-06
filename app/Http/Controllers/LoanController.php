@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Loan;
 use App\Models\Book;
-use App\Models\User;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 use Auth;
-
 class LoanController extends Controller
 {
     /**
@@ -18,14 +16,15 @@ class LoanController extends Controller
      */
     public function index()
     {
-       
+        if(Auth::user()->hasPermissionTo('view loans')){
+            if(Auth::user()->role_id == 1)
+                $loans = Loan::with('books.Category','users')->get();
+            else
+                $loans = Loan::with('books.Category','users')->where('user_id',Auth::user()->id)->get();
 
-        $loans = Loan::all();
-        $books = Book::all();
-        $users = User::all();
-
-        return view('loans.index',compact('loans', 'books', 'users'));
-   
+            return view('loans.index',compact('loans'));
+        }
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -46,10 +45,17 @@ class LoanController extends Controller
      */
     public function store(Request $request)
     {
-        if ($loan = Loan::create($request->all())) {
-            return redirect()->back()->with('success', 'El registro se creó correctamente');
+        if(Auth::user()->hasPermissionTo('create loans')){
+            $book = Book::where('id',$request['book_id']);
+            $book->Update(['status' => 1]);
+            $loan = new Loan();
+            $loan->user_id = Auth::user()->id;
+            $loan->book_id = $request['book_id'];
+            $loan->state = 1;
+            $loan->save();
+            return  redirect()->back()->with('success', 'Se ha creado el prestamo');
         }
-         return redirect()->back()->with('error', 'No se pudo crear el registro');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -58,9 +64,13 @@ class LoanController extends Controller
      * @param  \App\Models\Loan  $loan
      * @return \Illuminate\Http\Response
      */
-    public function show(Loan $loan)
+    public function show()
     {
-        //
+
+            $loans = Loan::with('books')->get()->groupBy('book_id');
+            return $loans;
+
+        
     }
 
     /**
@@ -71,7 +81,7 @@ class LoanController extends Controller
      */
     public function edit(Loan $loan)
     {
-        //
+        
     }
 
     /**
@@ -81,13 +91,19 @@ class LoanController extends Controller
      * @param  \App\Models\Loan  $loan
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, Loan $loan)
     {
-        $loan = Loan::find($request->id);
-        if ($loan->update($request->all())) {
-            return redirect()->back()->with('success', 'El registro se modificó correctamente');
+        if(Auth::user()->hasPermissionTo('update loans')){
+            $loan = Loan::find($request['id']);
+            $book = Book::where('id',$loan->book_id);
+            $book->Update(['status'=>0]);
+            if($loan->Update($request->all())){
+                return  redirect()->back()->with('success', 'Se ha regresado el libro');
+            }
+            return  redirect()->back()->with('error', 'No se ha regresado el libro');
+
         }
-        return redirect()->back()->with('error', 'No se pudo modificar el registro');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -98,17 +114,25 @@ class LoanController extends Controller
      */
     public function destroy(Loan $loan)
     {
-        if ($loan) {
-            if ($loan->delete()) {
-               return response()->json([
-                    'message' => 'Registro eliminado correctamente',
-                    'code' => '200'
-                ]);
+        if(Auth::user()->hasPermissionTo('delete loans')){
+            if($loan){
+                $book = Book::find($loan->book_id);
+                $book->Update(['status' => 0]);
+                if($loan->delete()){
+                    return response()->json([
+                        'message' => 'Se ha eliminado el prestamo', 
+                        'code' => '200'
+                    ]);
+                }
+                return response()->json([
+                        'message' => "No se ha eliminado el prestamo", 
+                        'code' => '400'
+                    ]);
             }
         }
         return response()->json([
-                'message' => 'No se pudo eliminar el registro',
-                'code' => '400'
-            ]);
+            'message' => "No tienes permisos", 
+            'code' => '403'
+        ]);
     }
 }

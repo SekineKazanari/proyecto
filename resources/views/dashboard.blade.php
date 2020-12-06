@@ -1,54 +1,73 @@
-@if (Auth::user()->hasPermissionTo('crud categories'))
-    <x-app-layout>
-        <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard') }}
-            </h2>
-        </x-slot>
-
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-
-                    <h1>Información sobre los prestamos</h1>
-                    <p></p>
-                    <h4>Promedio de generos de libros prestados</h4>
-                    <h5>Aquí se muestra el genero que los usuarios prefieren</h5>
-
-                    <canvas id="myChart"></canvas>
-                    
-                </div>
-            </div>
-        </div>
-
-    </x-app-layout> 
-        <x-slot name="script">
-
-        </script>
-    </x-slot>
-@endif
-
-
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Bienvenido') }}
+            {{ __('Dashboard') }}
         </h2>
+        <head>
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script type="text/javascript">
+        var token = {
+            _token: '{{ csrf_token() }}'
+        };
+        
+        var estadisticas = []
+        var chart = []
+          async function obtenerPrestamos() {
+                var datos = [];
+                 const response = await axios.get('{{url('loans/stats')}}', token);
+                 var datos = response.data;
+                 var array = []
+                 var array2 = []
+                 array.push(Object.values(datos));
+                    array.forEach(element => {
+                        array.forEach(i => {
+                            array2.push(i)
+                        });
+                    });
+                    array2.forEach(element => {
+                        element.forEach(x => {
+                            estadisticas.push(['"'+[x[0]['books'].title]+'"',x.length])
+                        });
+                    });
+
+                 }     
+                 obtenerPrestamos()
+
+                 console.log(estadisticas)
+            $(document).ready(function(){
+              google.charts.load('current', {'packages':['corechart']});
+              google.charts.setOnLoadCallback(drawChart);
+            })
+
+              function drawChart() {
+        
+                // Create the data table.
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Topping');
+                data.addColumn('number', 'Slices');
+                data.addRows(estadisticas);
+        
+                var options = {'title':'% de préstamos por libro',
+                               'width':800,
+                               'height':600};
+        
+                var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+              }
+            </script>
+          </head>
+        
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <h1>Pasele a lo barrido</h1>
-                <p></p>
-                <div align="center" style="margin-bottom: 20px">
-                    <img src="{{ asset('img/dashboard/xd.jpg') }}">
-                </div>
-                <p></p>
-                <h4>Para poder comenzar seleccione la categoría a la que desee entrar desde el menú despegable que se mostrará dando click en su nombre de usuario.</h4>
+                <div id="chart_div"></div>
             </div>
         </div>
     </div>
-</x-app-layout> 
 
-
+    <script>
+        
+    </script>
+</x-app-layout>

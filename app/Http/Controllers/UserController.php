@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-
+use App\Models\User;
+use App\Models\Loan;
 use Auth;
-
 class UserController extends Controller
 {
     /**
@@ -16,15 +15,11 @@ class UserController extends Controller
      */
     public function index()
     {
-       if (Auth::user()->hasPermissionTo('crud categories')) {
-
+        if(Auth::user()->hasPermissionTo('crud users')){
             $users = User::all();
             return view('users.index',compact('users'));
-        }else{
-            return redirect()->back()->with('error', 'No tienes permisos');
         }
-       
-   
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -34,7 +29,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+      
     }
 
     /**
@@ -45,30 +40,46 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        if ($user = User::create($request->all())) {
-            return redirect()->back()->with('success', 'El registro se creó correctamente');
+        if(Auth::user()->hasPermissionTo('crud users')){
+            $user = new User();
+            $user = User::create([
+                'name' => $request['name'],
+                'email' => $request['email'],
+                'password' => bcrypt($request['password']),
+                'role_id' => $request['role_id']
+            ]);
+            $user->assignRole($user->role_id);
+            if($user->name!=null){
+                return  redirect()->back()->with('success', 'Se ha creado el usuario');
+            }
+            return  redirect()->back()->with('error', 'No se ha creado el usuario');
         }
-         return redirect()->back()->with('error', 'No se pudo crear el registro');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show($id)
     {
-        //
+        if(Auth::user()->hasPermissionTo('crud users')){
+            $user = User::find($id)->get();
+            $loans = Loan::where('user_id', $id)->get();
+            return view('users.details',compact('user','loans'));
+        }
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit($id)
     {
         //
     }
@@ -77,37 +88,48 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
     {
-        $user = User::find($request->id);
-        if ($user->update($request->all())) {
-            return redirect()->back()->with('success', 'El registro se modificó correctamente');
+        if(Auth::user()->hasPermissionTo('crud users')){
+            $user = User::find($request['id']);
+            if($user->Update($request->all())){
+                return  redirect()->back()->with('success', 'El usuario se ha actualizado correctamente');
+            }
+            return  redirect()->back()->with('error', 'No se pudo actualizar el usuario');
         }
-        return redirect()->back()->with('error', 'No se pudo modificar el registro');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        if ($user) {
-            if ($user->delete()) {
-               return response()->json([
-                    'message' => 'Registro eliminado correctamente',
-                    'code' => '200'
-                ]);
+        if(Auth::user()->hasPermissionTo('crud users')){
+            $user = User::find($id);
+            if($user!=null){
+                Loan::where('user_id',$id)->delete();
+                if($user->delete()){
+                    return response()->json([
+                        'message' => 'Se ha eliminado el usuario', 
+                        'code' => '200'
+                    ]);
+                }
+                return response()->json([
+                        'message' => "No ha eliminado el usuario", 
+                        'code' => '400'
+                    ]);
             }
         }
         return response()->json([
-                'message' => 'No se pudo eliminar el registro',
-                'code' => '400'
-            ]);
+            'message' => "No tienes permisos", 
+            'code' => '403'
+        ]);
     }
 }

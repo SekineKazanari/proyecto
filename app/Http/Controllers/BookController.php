@@ -6,9 +6,7 @@ use App\Models\Book;
 use App\Models\Category;
 use App\Models\Loan;
 use Illuminate\Http\Request;
-
 use Auth;
-
 class BookController extends Controller
 {
     /**
@@ -18,11 +16,12 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::all();
-        $categories = Category::all();
-        $loans = Loan::all();
-
-        return view('books.index',compact('books', 'categories', 'loans'));
+        if(Auth::user()->hasPermissionTo('view books')){
+            $books = Book::with('Category')->get();
+            $categories = Category::all();
+            return view('books.index',compact('books','categories'));
+        }
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -43,29 +42,20 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-
-        if (Auth::user()->hasPermissionTo('add books')){
-            
-            if ($book = Book::create($request->all())) {
-
+        if(Auth::user()->hasPermissionTo('create books')){
+            if($book = Book::create($request->all())){
                 if ($request->hasFile('cover')) {
-
                     $file = $request->file('cover');
-                    $file_name = 'book_cover'.$book->id.'.'.$file->getClientOriginalExtension();
-
-                    $path = $request->file('cover')->storeAs(
-                        'img/books',$file_name
-                    );
-
-                    $book->cover = $file_name;
+                    $fileName = 'book_cover'.$book->id.'.'.$file->getClientOriginalExtension();
+                    $path = $request->file('cover')->storeAs('img/books',$fileName);
+                    $book->cover = $fileName;
                     $book->save();
                 }
-
-               return redirect()->back();
+                return  redirect()->back()->with('success', 'Se ha creado el libro');
             }
+            return  redirect()->back()->with('error', "No se pudo crear el libro");
         }
-        
-         return redirect()->back()->with('error', 'No tienes permisos');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -74,8 +64,14 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show($id)
     {
+        if(Auth::user()->hasPermissionTo('update books')){
+            $book = Book::with('Category')->where('id',$id)->get();
+            $loans = Loan::with('books','users')->where('book_id',$id)->get();
+            return view('books.info',compact('book','loans'));
+        }
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -98,14 +94,21 @@ class BookController extends Controller
      */
     public function update(Request $request)
     {
-        $book = Book::find($request->id); 
-        //Arreglar
-        var_dump($book);
-        if ($book->update($request->all())) {
-            return redirect()->back()->with('success', 'El libro se modificó correctamente');
-            var_dump($book);
+        if(Auth::user()->hasPermissionTo('update books')){
+            $book = Book::find($request['id']);
+            if($book->Update($request->all())){
+                if ($request->hasFile('cover')) {
+                    $file = $request->file('cover');
+                    $fileName = 'book_cover'.$book->id.'.'.$file->getClientOriginalExtension();
+                    $path = $request->file('cover')->storeAs('img/books',$fileName);
+                    $book->cover = $fileName;
+                    $book->save();
+                }
+                return  redirect()->back()->with('success', 'Se ha actualizado el libro');
+            }
+            return redirect()->back()->with('error', 'No se ha actualizado el libro'); 
         }
-         return redirect()->back()->with('error', 'No se pudo modificar el libro');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -116,17 +119,24 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-         if ($book) {
-            if ($book->delete()) {
-               return response()->json([
-                    'message' => 'Registro eliminado correctamente',
-                    'code' => '200'
-                ]);
+        if(Auth::user()->hasPermissionTo('delete books')){
+            if($book){
+                Loan::where('book_id',$book->id)->delete();
+                if($book->delete()){
+                    return response()->json([
+                        'message' => 'Se ha eliminado el libro', 
+                        'code' => '200'
+                    ]);
+                }
+                return response()->json([
+                        'message' => "No se ha eliminado el libro", 
+                        'code' => '400'
+                    ]);
             }
         }
         return response()->json([
-                'message' => 'No se pudo eliminar el registro',
-                'code' => '400'
-            ]);
+            'message' => "No tienes permisos", 
+            'code' => '403'
+        ]);
     }
 }

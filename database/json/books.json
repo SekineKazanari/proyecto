@@ -1,0 +1,39 @@
+[
+    {
+        "title":"Alicia en el país de las maravillas",
+        "description":"Las aventuras de Alicia en el país de las maravillas, comúnmente abreviado como Alicia en el país de las maravillas, es una novela de fantasía escrita por el matemático, lógico, fotógrafo y escritor británico Charles Lutwidge Dodgson, bajo el seudónimo de Lewis Carroll",
+        "year":1992,
+        "pages":600,
+        "isbn":"123",
+        "editorial":"IVREA",
+        "edition":"3",
+        "autor":"Charles Lutwidge Dodgson",
+        "cover":"book.png",
+        "category_id":"1"
+    },
+    {
+        "title":"Tanya the evil",
+        "description":"La historia de un soldado de alemania tratando de dominar el mundo",
+        "year":2015,
+        "pages":300,
+        "isbn":"456",
+        "editorial":"Panini",
+        "edition":"1",
+        "autor":"Carlo Zen ",
+        "cover":"book.png",
+        "category_id":"3"
+    },
+    {
+        "title":"Fairy Tail",
+        "description":"La mejor historia de las hadas contra el mal.",
+        "year":2010,
+        "pages":500,
+        "isbn":"789",
+        "editorial":"IVREA",
+        "edition":"1",
+        "autor":" Hiro Mashima",
+        "cover":"book.png",
+        "category_id":"3"
+    }
+
+]

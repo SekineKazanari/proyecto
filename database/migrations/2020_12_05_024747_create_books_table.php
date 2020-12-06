@@ -15,26 +15,18 @@ class CreateBooksTable extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-
             $table->string('title');
-            $table->longText('description')->nullable();
-            
-            $table->integer('year');
+            $table->longText('description')->nulleable();
+            $table->integer('year')->default(0);
             $table->integer('pages')->default(0);
-
             $table->string('isbn')->unique();
             $table->string('editorial')->nullable();
-            $table->string('edition')->default(1);
+            $table->integer('edition')->default(1);
             $table->string('autor');
-
             $table->string('cover')->default('book.png');
-
-            $table->unsignedBigInteger('category_id')->nullable();
-
+            $table->unsignedBigInteger('category_id')->nulleable();
             $table->foreign('category_id')->references('id')->on('categories');
-
-             $table->integer('status')->default(0);
-
+            $table->boolean('status')->default(false);
             $table->timestamps();
         });
     }

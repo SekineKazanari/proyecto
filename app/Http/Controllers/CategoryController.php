@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
-
 use Auth;
-
 class CategoryController extends Controller
 {
     /**
@@ -15,17 +13,13 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        if (Auth::user()->hasPermissionTo('crud categories')) {
-
+    {   
+        if(Auth::user()->hasPermissionTo('crud categories')){
             $categories = Category::all();
-
             return view('categories.index',compact('categories'));
-        }else{
-            return redirect()->back()->with('error', 'No tienes permisos');
         }
-
-       
+        return redirect()->back()->with("error","No tienes permisos"); 
+        
     }
 
     /**
@@ -46,10 +40,13 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        if ($category = Category::create($request->all())) {
-            return redirect()->back()->with('success', 'El registro se creó correctamente');
-        }
-         return redirect()->back()->with('error', 'No se pudo crear el registro');
+        if(Auth::user()->hasPermissionTo('crud categories')){
+            if($category = Category::create($request->all())){
+                return  redirect()->back()->with('success', 'La categoría se ha creado correctamente');
+            }
+            return  redirect()->back()->with('error', 'No se pudo crear la categoría');
+         }
+         return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -83,11 +80,14 @@ class CategoryController extends Controller
      */
     public function update(Request $request)
     {
-        $category = Category::find($request->id);
-        if ($category->update($request->all())) {
-            return redirect()->back()->with('success', 'El registro se modificó correctamente');
+        if(Auth::user()->hasPermissionTo('crud categories')){
+            $category = Category::find($request['id']);
+            if($category->Update($request->all())){
+                return  redirect()->back()->with('success', 'La categoría se ha actualizado correctamente');
+            }
+            return  redirect()->back()->with('error', 'No se pudo actualizar la categoría');
         }
-        return redirect()->back()->with('error', 'No se pudo modificar el registro');
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 
     /**
@@ -98,17 +98,20 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        if ($category) {
-            if ($category->delete()) {
-               return response()->json([
-                    'message' => 'Registro eliminado correctamente',
-                    'code' => '200'
-                ]);
+        if(Auth::user()->hasPermissionTo('crud categories')){
+            if($category){
+                if($category->delete()){
+                    return response()->json([
+                        'message' => 'La categoria se ha eliminado correctamente', 
+                        'code' => '200'
+                    ]);
+                }
+                return response()->json([
+                        'message' => 'No se pudo eliminar la categoria', 
+                        'code' => '400'
+                    ]);
             }
         }
-        return response()->json([
-                'message' => 'No se pudo eliminar el registro',
-                'code' => '400'
-            ]);
+        return redirect()->back()->with("error","No tienes permisos"); 
     }
 }

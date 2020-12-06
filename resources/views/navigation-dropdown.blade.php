@@ -41,45 +41,30 @@
 
                     <x-slot name="content">
                         <!-- Account Management -->
-                        {{-- <div class="block px-4 py-2 text-xs text-gray-400">
+                        <div class="block px-4 py-2 text-xs text-gray-400">
                             {{ __('Manage Account') }}
-                        </div> --}}
+                        </div>
 
                         <x-jet-dropdown-link href="{{ route('profile.show') }}">
                             {{ __('Profile') }}
                         </x-jet-dropdown-link>
 
-                        <x-jet-dropdown-link href="{{ url('books') }}">
-                            {{ __('Books') }}
+                        <x-jet-dropdown-link href="{{ url('books')}}">
+                            {{ __('Libros') }}
+                        </x-jet-dropdown-link>
+                        
+                        <x-jet-dropdown-link href="{{ url('loans')}}">
+                            {{ __('Prestamos') }}
+                        </x-jet-dropdown-link>
+                        @if(Auth::user()->role_id == 1)
+                        <x-jet-dropdown-link href="{{ url('categories')}}">
+                            {{ __('Categorias') }}
                         </x-jet-dropdown-link>
 
-                        @if (Auth::user()->hasPermissionTo('crud categories'))
-
-                            <x-jet-dropdown-link href="{{ url('categories') }}">
-                                {{ __('Categories') }}
-                            </x-jet-dropdown-link>
-
+                        <x-jet-dropdown-link href="{{ url('users')}}">
+                            {{ __('Usuarios') }}
+                        </x-jet-dropdown-link>
                         @endif
-
-                        <x-jet-dropdown-link href="{{ url('loans') }}">
-                            {{ __('Loans') }}
-                        </x-jet-dropdown-link>
-
-                        @if (Auth::user()->hasPermissionTo('crud categories'))
-
-                            <x-jet-dropdown-link href="{{ url('users') }}">
-                                {{ __('Users') }}
-                            </x-jet-dropdown-link>
-
-                        @endif
-
-
-                        <x-jet-dropdown-link href="{{ url('dashboard') }}">
-                            {{ __('Dashboard') }}
-                        </x-jet-dropdown-link>
-
-
-
                         @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                             <x-jet-dropdown-link href="{{ route('api-tokens.index') }}">
                                 {{ __('API Tokens') }}

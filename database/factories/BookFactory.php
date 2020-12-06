@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Loan;
+use App\Models\Book;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class LoanFactory extends Factory
+class BookFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Loan::class;
+    protected $model = Book::class;
 
     /**
      * Define the model's default state.
