@@ -17,7 +17,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <table class="table table-striped">
+                <table class="table">
                     <thead>
                         <tr class="thead-dark">
                         <th scope="col">#</th>
@@ -69,12 +69,10 @@
                     <div class="form-group">
                       <label for="exampleInputCategoryName">Name</label>
                       <input type="text" class="form-control" id="c_name" name="name" aria-describedby="caregoryName" placeholder="Category name" required>
-                      <small id="categoryName" class="form-text text-muted">Add a name</small>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputCategoryName">Description</label>
                         <textarea class="form-control" id="c_description" name="description" rows="5"></textarea required>
-                        <small id="categoryDescription" class="form-text text-muted">Add a description</small>
                       </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -101,12 +99,10 @@
                     <div class="form-group">
                       <label for="exampleInputCategoryName">Name</label>
                       <input type="text" class="form-control" id="name" name="name" aria-describedby="caregoryName" placeholder="Enter category name" required>
-                      <small id="categoryNameEdit" class="form-text text-muted">Add a name</small>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputCategoryName">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="5"></textarea required>
-                        <small id="categoryDescriptionEdit" class="form-text text-muted">Add a description</small>
                       </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
