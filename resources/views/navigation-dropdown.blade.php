@@ -58,7 +58,7 @@
                         </x-jet-dropdown-link>
                         @if(Auth::user()->role_id == 1)
                         <x-jet-dropdown-link href="{{ url('categories')}}">
-                            {{ __('Categorias') }}
+                            {{ __('Categorías') }}
                         </x-jet-dropdown-link>
 
                         <x-jet-dropdown-link href="{{ url('users')}}">

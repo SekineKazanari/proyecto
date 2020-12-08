@@ -43,12 +43,12 @@
                                 @csrf
                                 <input type="hidden" name="id" value="{{$loan->id}}">
                                 <input type="hidden" name="state" value="0">
-                                <button type="submit" class="btn btn-primary">Regresar</button>
+                                <button type="submit" class="btn btn-primary mr-1">Regresar</button>
                             </form>
                             @endif
                         @if(Auth::user()->hasPermissionTo('delete loans'))
-                            <button type="button" class="btn btn-warning" onclick="info({{$loan}})" data-toggle="modal" data-target="#infoModal">Detalles</button>
-                            <button type="button" class="btn btn-danger" onclick="eliminarPrestamo({{$loan->id}},this)">Eliminar</button>
+                            <button type="button" class="btn btn-warning mr-1" onclick="info({{$loan}})" data-toggle="modal" data-target="#infoModal">Detalles</button>
+                            <button type="button" class="btn btn-danger mr-1" onclick="eliminarPrestamo({{$loan->id}},this)">Eliminar</button>
                             @endif
                         </td>
                       @endforeach
